@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Pulse Survey | unpatched</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Poppins:wght@400;600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple: #7C7BFF;
+            --purple-light: #A5A5FF;
+            --purple-dark: #5C5CDD;
+            --black: #0F0F0F;
+            --white: #FAFAFA;
+            --gray: #4B5563;
+            --gray-light: #9CA3AF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, var(--black) 0%, #1a1a2e 100%);
+            color: var(--white);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveGrid 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes moveGrid {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--purple) 0%, var(--purple-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--gray-light);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 10px;
+            margin-bottom: 3rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--purple) 0%, var(--purple-light) 100%);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+        }
+
+        /* Question card */
+        .question-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: none;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .question-card.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question-number {
+            font-size: 0.75rem;
+            color: var(--purple);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .question-text {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            line-height: 1.4;
+            color: var(--white);
+        }
+
+        /* Radio options */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .option {
+            position: relative;
+        }
+
+        .option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .option label {
+            display: block;
+            padding: 1.2rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option label::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .option label:hover {
+            border-color: var(--purple);
+            background: rgba(139, 92, 246, 0.1);
+            transform: translateX(5px);
+        }
+
+        .option label:hover::before {
+            left: 100%;
+        }
+
+        .option input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(167, 139, 250, 0.2) 100%);
+            border-color: var(--purple-light);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .option input[type="radio"]:checked + label::after {
+            content: '✓';
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--purple-light);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Text area */
+        .text-input {
+            width: 100%;
+            min-height: 150px;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            color: var(--white);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--purple);
+            background: rgba(139, 92, 246, 0.1);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+
+        .text-input::placeholder {
+            color: var(--gray-light);
+        }
+
+        /* Navigation buttons */
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-prev {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-prev:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);
+            color: var(--white);
+            border: 2px solid var(--purple);
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-next:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: var(--white);
+            border: 2px solid #10B981;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Completion screen */
+        .completion {
+            display: none;
+            text-align: center;
+            padding: 4rem 2rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .completion.active {
+            display: block;
+        }
+
+        .completion-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            animation: bounce 1s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .completion h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--purple) 0%, var(--purple-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .completion p {
+            font-size: 1rem;
+            color: var(--gray-light);
+            margin-bottom: 2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .question-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .question-text {
+                font-size: 1.2rem;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--black);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--purple);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--purple-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">unpatched</div>
+            <div class="subtitle">Team Pulse Survey</div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <form id="surveyForm">
+            <!-- Question 1 -->
+            <div class="question-card active" data-question="1">
+                <div class="question-number">Question 01</div>
+                <div class="question-text">Overall, how manageable does your workload feel right now?</div>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" id="q1a1" name="q1" value="Very manageable" required>
+                        <label for="q1a1">Very manageable</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q1a2" name="q1" value="Mostly manageable">
+                        <label for="q1a2">Mostly manageable</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q1a3" name="q1" value="Neutral">
+                        <label for="q1a3">Neutral</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q1a4" name="q1" value="Hard to manage">
+                        <label for="q1a4">Hard to manage</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q1a5" name="q1" value="Overwhelming">
+                        <label for="q1a5">Overwhelming</label>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-next" onclick="nextQuestion()"><span>Next →</span></button>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-card" data-question="2">
+                <div class="question-number">Question 02</div>
+                <div class="question-text">Do you feel properly resourced to do your job right now? (people, time, tools, support)</div>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" id="q2a1" name="q2" value="Yes, fully" required>
+                        <label for="q2a1">Yes, fully</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q2a2" name="q2" value="Mostly">
+                        <label for="q2a2">Mostly</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q2a3" name="q2" value="Somewhat">
+                        <label for="q2a3">Somewhat</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q2a4" name="q2" value="Not really">
+                        <label for="q2a4">Not really</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q2a5" name="q2" value="Not at all">
+                        <label for="q2a5">Not at all</label>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevQuestion()"><span>← Back</span></button>
+                    <button type="button" class="btn btn-next" onclick="nextQuestion()"><span>Next →</span></button>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-card" data-question="3">
+                <div class="question-number">Question 03</div>
+                <div class="question-text">What parts of your work currently feel easy or smooth?</div>
+                <textarea class="text-input" name="q3" placeholder="Share your thoughts here..." required></textarea>
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevQuestion()"><span>← Back</span></button>
+                    <button type="button" class="btn btn-next" onclick="nextQuestion()"><span>Next →</span></button>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-card" data-question="4">
+                <div class="question-number">Question 04</div>
+                <div class="question-text">What parts of your work feel harder than they should?</div>
+                <textarea class="text-input" name="q4" placeholder="Share your thoughts here..." required></textarea>
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevQuestion()"><span>← Back</span></button>
+                    <button type="button" class="btn btn-next" onclick="nextQuestion()"><span>Next →</span></button>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-card" data-question="5">
+                <div class="question-number">Question 05</div>
+                <div class="question-text">Do you feel we've followed through on what was promised to you? (role expectations, workload, support, growth, timelines)</div>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" id="q5a1" name="q5" value="Yes, consistently" required>
+                        <label for="q5a1">Yes, consistently</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q5a2" name="q5" value="Mostly">
+                        <label for="q5a2">Mostly</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q5a3" name="q5" value="Somewhat">
+                        <label for="q5a3">Somewhat</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q5a4" name="q5" value="Rarely">
+                        <label for="q5a4">Rarely</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q5a5" name="q5" value="Not at all">
+                        <label for="q5a5">Not at all</label>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevQuestion()"><span>← Back</span></button>
+                    <button type="button" class="btn btn-next" onclick="nextQuestion()"><span>Next →</span></button>
+                </div>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="question-card" data-question="6">
+                <div class="question-number">Question 06</div>
+                <div class="question-text">How would you describe your team's current capacity and morale?</div>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" id="q6a1" name="q6" value="Strong capacity, high morale" required>
+                        <label for="q6a1">Strong capacity, high morale</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q6a2" name="q6" value="Adequate capacity, generally positive morale">
+                        <label for="q6a2">Adequate capacity, generally positive morale</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q6a3" name="q6" value="Tight capacity, mixed morale">
+                        <label for="q6a3">Tight capacity, mixed morale</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q6a4" name="q6" value="Stretched capacity, low morale">
+                        <label for="q6a4">Stretched capacity, low morale</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q6a5" name="q6" value="Unsustainable capacity, very low morale">
+                        <label for="q6a5">Unsustainable capacity, very low morale</label>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevQuestion()"><span>← Back</span></button>
+                    <button type="button" class="btn btn-next" onclick="nextQuestion()"><span>Next →</span></button>
+                </div>
+            </div>
+
+            <!-- Question 7 -->
+            <div class="question-card" data-question="7">
+                <div class="question-number">Question 07</div>
+                <div class="question-text">Do you feel comfortable raising concerns or asking for help when needed?</div>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" id="q7a1" name="q7" value="Very comfortable" required>
+                        <label for="q7a1">Very comfortable</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q7a2" name="q7" value="Somewhat comfortable">
+                        <label for="q7a2">Somewhat comfortable</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q7a3" name="q7" value="Neutral">
+                        <label for="q7a3">Neutral</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q7a4" name="q7" value="Somewhat uncomfortable">
+                        <label for="q7a4">Somewhat uncomfortable</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" id="q7a5" name="q7" value="Very uncomfortable">
+                        <label for="q7a5">Very uncomfortable</label>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevQuestion()"><span>← Back</span></button>
+                    <button type="button" class="btn btn-next" onclick="nextQuestion()"><span>Next →</span></button>
+                </div>
+            </div>
+
+            <!-- Question 8 -->
+            <div class="question-card" data-question="8">
+                <div class="question-number">Question 08</div>
+                <div class="question-text">What is one resource, change, or support that would make your work easier right now?</div>
+                <textarea class="text-input" name="q8" placeholder="Share your thoughts here..." required></textarea>
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevQuestion()"><span>← Back</span></button>
+                    <button type="button" class="btn btn-next" onclick="nextQuestion()"><span>Next →</span></button>
+                </div>
+            </div>
+
+            <!-- Question 9 -->
+            <div class="question-card" data-question="9">
+                <div class="question-number">Question 09</div>
+                <div class="question-text">What's one thing that's working well right now and should be protected?</div>
+                <textarea class="text-input" name="q9" placeholder="Share your thoughts here..." required></textarea>
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevQuestion()"><span>← Back</span></button>
+                    <button type="button" class="btn btn-next" onclick="nextQuestion()"><span>Next →</span></button>
+                </div>
+            </div>
+
+            <!-- Question 10 -->
+            <div class="question-card" data-question="10">
+                <div class="question-number">Question 10</div>
+                <div class="question-text">Is there anything leadership should be aware of right now?</div>
+                <textarea class="text-input" name="q10" placeholder="Share your thoughts here (optional)..."></textarea>
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevQuestion()"><span>← Back</span></button>
+                    <button type="button" class="btn btn-submit" onclick="submitSurvey(event)"><span>Submit Survey</span></button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Completion screen -->
+        <div class="completion" id="completion">
+            <div class="completion-icon">✨</div>
+            <h2>Thank You!</h2>
+            <p>Your feedback has been submitted successfully.<br>We truly appreciate you taking the time to share your thoughts.</p>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        const totalQuestions = 10;
+
+        function updateProgress() {
+            const progress = (currentQuestion / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function showQuestion(questionNumber) {
+            const cards = document.querySelectorAll('.question-card');
+            cards.forEach(card => {
+                card.classList.remove('active');
+                if (parseInt(card.dataset.question) === questionNumber) {
+                    card.classList.add('active');
+                }
+            });
+            currentQuestion = questionNumber;
+            updateProgress();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function nextQuestion() {
+            const currentCard = document.querySelector(`.question-card[data-question="${currentQuestion}"]`);
+            const requiredInputs = currentCard.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredInputs.forEach(input => {
+                if (input.type === 'radio') {
+                    const radioGroup = currentCard.querySelectorAll(`input[name="${input.name}"]`);
+                    const isChecked = Array.from(radioGroup).some(radio => radio.checked);
+                    if (!isChecked) isValid = false;
+                } else if (input.type === 'textarea' || input.type === 'text') {
+                    if (!input.value.trim()) isValid = false;
+                }
+            });
+
+            if (!isValid) {
+                alert('Please answer this question before continuing.');
+                return;
+            }
+
+            if (currentQuestion < totalQuestions) {
+                showQuestion(currentQuestion + 1);
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 1) {
+                showQuestion(currentQuestion - 1);
+            }
+        }
+
+        function submitSurvey(event) {
+            event.preventDefault();
+            
+            // Collect all form data
+            const formData = new FormData(document.getElementById('surveyForm'));
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+
+            // Here you would normally send the data to your backend
+            console.log('Survey Data:', data);
+            
+            // For now, we'll just show the completion screen
+            document.getElementById('surveyForm').style.display = 'none';
+            document.querySelector('.progress-container').style.display = 'none';
+            document.getElementById('completion').classList.add('active');
+
+            // In production, you would send data like this:
+            /*
+            fetch('YOUR_BACKEND_URL/submit-survey', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // Show completion screen
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+            */
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>
